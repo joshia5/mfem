@@ -18,6 +18,7 @@
 #include <Omega_h_library.hpp>
 #include <Omega_h_mesh.hpp>
 #include <Omega_h_comm.hpp>
+#include <Omega_h_build.hpp>
 
 #ifndef MFEM_USE_OMEGAH
 #error This example requires that MFEM is built with MFEM_USE_OMEGAH=YES
