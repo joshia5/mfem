@@ -346,6 +346,18 @@ if (MFEM_USE_OMEGAH)
     get_target_property(OMEGAH_INCLUDE_DIRS
       Omega_h::omega_h INTERFACE_INCLUDE_DIRECTORIES)
     set(OMEGAH_LIBRARIES Omega_h::omega_h)
+    #hack to remove '-Werror', '-Wall', and '-Wextra' flags - mfem has warnings
+    get_property(ohFlags TARGET Omega_h::omega_h PROPERTY
+      INTERFACE_COMPILE_OPTIONS)
+    set(ohFlagsMod)
+    foreach(arg ${ohFlags})
+      string(REPLACE "-Werror" "" argMod0 ${arg})
+      string(REPLACE "-Wall" "" argMod1 ${argMod0})
+      string(REPLACE "-Wextra" "" argMod2 ${argMod1})
+      list(APPEND ohFlagsMod ${argMod})
+    endforeach()
+    set_property(TARGET Omega_h::omega_h PROPERTY
+        INTERFACE_COMPILE_OPTIONS "${ohFlagsMod}")
   endif()
 endif()
 
