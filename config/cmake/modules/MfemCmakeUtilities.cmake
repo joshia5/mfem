@@ -742,7 +742,7 @@ function(mfem_export_mk_files)
       MFEM_USE_GNUTLS MFEM_USE_GSLIB MFEM_USE_NETCDF MFEM_USE_PETSC
       MFEM_USE_SLEPC MFEM_USE_MPFR MFEM_USE_SIDRE MFEM_USE_CONDUIT MFEM_USE_PUMI
       MFEM_USE_CUDA MFEM_USE_OCCA MFEM_USE_RAJA MFEM_USE_UMPIRE MFEM_USE_SIMD
-      MFEM_USE_ADIOS2)
+      MFEM_USE_ADIOS2 MFEM_USE_OMEGAH)
   foreach(var ${CONFIG_MK_BOOL_VARS})
     if (${var})
       set(${var} YES)
@@ -833,13 +833,43 @@ function(mfem_export_mk_files)
       endif()
     endforeach()
   endif()
-  # Define the variable 'MFEM_EXT_LIBS': handle other (not PUMI) libs
+  if ("${MFEM_USE_OMEGAH}" STREQUAL "YES")
+    get_target_property(liblist ${OMEGAH_LIBRARIES} INTERFACE_LINK_LIBRARIES)
+    set(omegah_dep_libs "${liblist}")
+    foreach(omegahlib ${liblist})
+      get_target_property(libdeps ${omegahlib} INTERFACE_LINK_LIBRARIES)
+      if (NOT "${libdeps}" MATCHES "libdeps-NOTFOUND")
+        list(APPEND omegah_dep_libs ${libdeps})
+      endif()
+    endforeach()
+    list(REMOVE_DUPLICATES omegah_dep_libs)
+    foreach(omegahlib ${omegah_dep_libs})
+      unset(lib CACHE)
+      string(REGEX REPLACE "^Omega_h::" "" libname ${omegahlib})
+      string(FIND "${omegahlib}" ".a" staticlib)
+      string(FIND "${omegahlib}" ".so" sharedlib)
+      find_library(lib ${libname} PATHS ${OMEGAH_DIR}/lib NO_DEFAULT_PATH)
+      if (NOT "${sharedlib}" MATCHES "-1" OR
+          NOT "${staticlib}" MATCHES "-1"   )
+        set(MFEM_EXT_LIBS "${omegahlib} ${MFEM_EXT_LIBS}")
+      elseif (NOT "${lib}" MATCHES "lib-NOTFOUND")
+        set(MFEM_EXT_LIBS "${lib} ${MFEM_EXT_LIBS}")
+      elseif ("${lib}" MATCHES "lib-NOTFOUND" AND
+              NOT "${libname}" MATCHES "can" AND
+              NOT "${libname}" MATCHES "pthread")
+        message(FATAL_ERROR "Omega_h lib ${libname} not found")
+      endif()
+    endforeach()
+  endif()
+  # Define the variable 'MFEM_EXT_LIBS': handle other (not PUMI and Omegah) libs
   foreach(lib ${TPL_LIBRARIES})
     get_filename_component(suffix ${lib} EXT)
     # handle interfaces (e.g., SCOREC::apf)
-    if ("${lib}" MATCHES "SCOREC::.*" OR "${lib}" MATCHES "Ginkgo::.*")
+    if ("${lib}" MATCHES "SCOREC::.*" OR 
+        "${lib}" MATCHES "Ginkgo::.*" OR
+        "${lib}" MATCHES "Omega_h::.*")
     elseif (NOT "${lib}" MATCHES "SCOREC::.*" AND "${lib}" MATCHES ".*::.*")
-      message(FATAL_ERROR "***** interface lib found ... exiting *****")
+      message(FATAL_ERROR "***** interface lib found \"${lib}\" ... exiting *****")
       # handle static and shared libs
     elseif ("${suffix}" STREQUAL "${CMAKE_SHARED_LIBRARY_SUFFIX}")
       get_filename_component(dir ${lib} DIRECTORY)
