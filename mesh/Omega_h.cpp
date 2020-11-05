@@ -100,17 +100,17 @@ void Omega_hMesh::Load(Omega_h::Mesh* o_mesh, int generate_edges, int refine,
    apf::FieldShape* crd_shape = apf::getShape(apf_field_crd);
    apf::Numbering* v_num_loc = apf::createNumbering(o_mesh, "VertexNumbering",
                                                 crd_shape, 1);
-*/
+  */
+    v_num_loc = Write<LO>(mesh.nverts(), 0, 1);
    auto crd = o_mesh.coords();
-    auto v_num = LOs(nents(0), 0, 1);
    // Check if it is a curved mesh
    //will not be for now
     //curved = (crd_shape->getOrder() > 1) ? 1 : 0;
 
    // Read mesh
-   ReadOmega_hMesh(o_mesh, v_num_loc, curved);
+   ReadOmegaMesh(o_mesh, v_num_loc, curved);
 #ifdef MFEM_DEBUG
-   mfem::out << "After ReadOmega_hMesh" << endl;
+   mfem::out << "After ReadOmegaMesh" << endl;
 #endif
    // at this point the following should be defined:
    //  1) Dim
@@ -157,12 +157,14 @@ void Omega_hMesh::Load(Omega_h::Mesh* o_mesh, int generate_edges, int refine,
    Finalize(refine, fix_orientation);
 }
 
-void Omega_hMesh::ReadOmega_hMesh(Omega_h::Mesh* o_mesh, apf::Numbering* v_num_loc,
+void OmegaMesh::ReadOmegaMesh(Omega_h::Mesh* o_mesh, LOs v_num_loc,
                               const int curved)
+//***Question: the mfem mesh contents are getting allocated and set on host,
+//will it be feasible to set this in device memory//
 {
    // Here fill the element table from SCOREC MESH
    // The vector of element pointers is generated with attr and connectivity
-
+/*
    apf::MeshIterator* itr = o_mesh->begin(0);
    apf::MeshEntity* ent;
    NumOfVertices = 0;
@@ -173,13 +175,15 @@ void Omega_hMesh::ReadOmega_hMesh(Omega_h::Mesh* o_mesh, apf::Numbering* v_num_l
       NumOfVertices++;
    }
    o_mesh->end(itr);
-      NumOfVertices = o_mesh->nverts();
+*/
+   NumOfVertices = o_mesh->nverts();
   
    Dim = o_mesh->dim();
    NumOfElements = o_mesh->nelems();
    elements.SetSize(NumOfElements);
 
    // Read elements from SCOREC Mesh
+/*
    itr = o_mesh->begin(Dim);
    unsigned int j=0;
    while ((ent = o_mesh->iterate(itr)))
@@ -190,13 +194,17 @@ void Omega_hMesh::ReadOmega_hMesh(Omega_h::Mesh* o_mesh, apf::Numbering* v_num_l
       // Get attribute Tag vs Geometry
       int attr = 1;
 
-      int geom_type = o_mesh->getType(ent);
-      elements[j] = NewElement(geom_type);
-      ReadPumiElement(ent, verts, attr, v_num_loc, elements[j]);
+      int geom_type = o_mesh->getType(ent);//get type of geom ent on which
+this ent is classified
+      elements[j] = NewElement(geom_type);//call mfem's newElement constructor
+      ReadPumiElement(ent, verts, attr, v_num_loc, elements[j]);//get that
+elem's vertex and 
       j++;
    }
    // End iterator
    o_mesh->end(itr);
+*/
+   verts = ask_down(dim(), 0);
 
    // Read Boundaries from SCOREC Mesh
    // First we need to count them

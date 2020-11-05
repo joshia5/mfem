@@ -42,14 +42,14 @@ namespace mfem
 {
 
 /// Base class for PUMI meshes
-class PumiMesh : public Mesh
+class OmegaMesh : public Mesh
 {
 protected:
-   void CountBoundaryEntity(apf::Mesh2* apf_mesh, const int BcDim, int &NumBC);
+   void CountBoundaryEntity(Omega_h::Mesh* o_mesh, const int BcDim, int &NumBC);
 
    // Readers for PUMI mesh formats, used in the Load() method.
-   void ReadSCORECMesh(apf::Mesh2* apf_mesh, apf::Numbering* v_num_loc,
-                       const int curved);
+   void ReadOmegaMesh(Omega_h::Mesh* o_mesh, apf::Numbering* v_num_loc,
+                       const int curved = 0);
 
 public:
    /// Generate an MFEM mesh from a PUMI mesh.
