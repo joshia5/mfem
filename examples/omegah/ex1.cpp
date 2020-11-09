@@ -29,9 +29,17 @@ using namespace mfem;
 
 int main(int argc, char *argv[])
 {
-   auto lib = Omega_h::Library();
-   auto mesh = Omega_h::build_box(lib.world(), OMEGA_H_SIMPLEX,
-       1., 1., 0, 2, 2, 0);
-   Omega_h::vtk::write_parallel("box", &mesh);
-   return 0;
+  auto lib = Omega_h::Library();
+  auto o_mesh = Omega_h::build_box(lib.world(), OMEGA_H_SIMPLEX,
+                                 1., 1., 0, 2, 2, 0);
+  Omega_h::vtk::write_parallel("box", &o_mesh);
+
+  // 1. Create the MFEM mesh object from the PUMI mesh. We can handle             
+  //    triangular and tetrahedral meshes. Other inputs are the same as the
+  //    MFEM default constructor.                                                 
+  Mesh *mesh = new OmegaMesh(o_mesh, 1, 1);
+
+  int dim = mesh->Dimension();
+
+  return 0;
 }
