@@ -30,6 +30,7 @@
 #include "mesh.hpp"
 #include "pmesh.hpp"
 
+/*
 #include <apf.h>
 #include <apfMesh2.h>
 #include <apfShape.h>
@@ -37,35 +38,36 @@
 #include <apfNumbering.h>
 #include <apfDynamicVector.h>
 #include <maMesh.h>
-
+*/
 namespace mfem
 {
 
-/// Base class for PUMI meshes
-class OmegaMesh : public Mesh
+/// Base class for Omega_h meshes
+class Omega_hMesh : public Mesh
 {
+/*
 protected:
    void CountBoundaryEntity(Omega_h::Mesh* o_mesh, const int BcDim, int &NumBC);
 
    // Readers for PUMI mesh formats, used in the Load() method.
-   void ReadOmegaMesh(Omega_h::Mesh* o_mesh, apf::Numbering* v_num_loc,
+   void ReadOmega_hMesh(Omega_h::Mesh* o_mesh, apf::Numbering* v_num_loc,
                        const int curved = 0);
-
+*/
 public:
    /// Generate an MFEM mesh from a PUMI mesh.
-   PumiMesh(apf::Mesh2* apf_mesh, int generate_edges = 0, int refine = 1,
-            bool fix_orientation = true);
+  Omega_hMesh(Omega_h::Mesh* o_mesh, bool fix_orientation = true);
 
+/*
    using Mesh::Load;
    /// Load a PUMI mesh (following the steps in the MFEM Load function).
-   void Load(apf::Mesh2* apf_mesh, int generate_edges = 0, int refine = 1,
+   void Load(Omega_h::Mesh* o_mesh, int generate_edges = 0, int refine = 1,
              bool fix_orientation = true);
-
-   /// Destroys Mesh.
-   virtual ~PumiMesh() { }
+*/
+   /// Destroys Mesh.//cannot be done in omega
+   //virtual ~Omega_hMesh() { }
 };
 
-
+/*
 /// Class for PUMI parallel meshes
 class ParPumiMesh : public ParMesh
 {
@@ -81,31 +83,31 @@ public:
 
 
    /// Returns the PUMI-to-MFEM permutation (aka rotation, aka orientation)
-   /** This represents the change in tet-to-vertex connectivity between
+   /// This represents the change in tet-to-vertex connectivity between
        the PUMI and MFEM meshes. E.g.,
        PUMI_tet{v0,v1,v2,v3}  --->  MFEM_tet{v1,v0,v3,v2}
        * Note that change in the orientation can be caused by
          a) fixing wrong boundary element orientations
-         b) a call to ReorientTetMesh() which is required for Nedelec */
+         b) a call to ReorientTetMesh() which is required for Nedelec //
    int RotationPUMItoMFEM(apf::Mesh2* apf_mesh,
                           apf::MeshEntity* tet,
                           int elemId);
    /// Convert the parent coordinate from PUMI to MFEM
-   /** By default this functions assumes that there is always
+   // By default this functions assumes that there is always
        change in the orientations of some of the elements. In case it
        is known for sure that there is NO change in the orientation,
-       call the functions with last argument = false */
+       call the functions with last argument = false //
    IntegrationRule ParentXisPUMItoMFEM(apf::Mesh2* apf_mesh,
                                        apf::MeshEntity* tet,
                                        int elemId,
                                        apf::NewArray<apf::Vector3>& pumi_xi,
                                        bool checkOrientation = true);
    /// Convert the parent coordinate from MFEM to PUMI
-   /** This is the inverse of ParentXisPUMItoMFEM.
+   // This is the inverse of ParentXisPUMItoMFEM.
        By default this functions assumes that there is always
        change in the orientations of some of the elements. In case it
        is known for sure that there is NO change in the orientation,
-       call the functions with last argument = false */
+       call the functions with last argument = false //
    void ParentXisMFEMtoPUMI(apf::Mesh2* apf_mesh,
                             int elemId,
                             apf::MeshEntity* tet,
@@ -160,7 +162,7 @@ public:
    /// Destroy the grid function.
    virtual ~GridFunctionPumi() { }
 };
-
+*/
 } // namespace mfem
 
 #endif // MFEM_USE_MPI

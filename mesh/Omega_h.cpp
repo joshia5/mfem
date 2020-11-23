@@ -9,7 +9,8 @@
 // terms of the BSD-3 license. We welcome feedback and contributions, see file
 // CONTRIBUTING.md for details.
 
-#include "pumi.hpp"
+#include "Omega_h.hpp"
+//#include "pumi.hpp"
 
 #ifdef MFEM_USE_PUMI
 #ifdef MFEM_USE_MPI
@@ -33,10 +34,11 @@ using namespace std;
 namespace mfem
 {
 
-static void ReadPumiElement(apf::MeshEntity* Ent, /* ptr to pumi entity */
+/*
+static void ReadPumiElement(apf::MeshEntity* Ent, // ptr to pumi entity //
                             apf::Downward Verts,
                             const int Attr, apf::Numbering* vert_num,
-                            Element* el /* ptr to mfem entity being created */
+                            Element* el // ptr to mfem entity being created //
                            )
 {
    int nv, *v;
@@ -55,14 +57,17 @@ static void ReadPumiElement(apf::MeshEntity* Ent, /* ptr to pumi entity */
    el->SetAttribute(Attr);
 }
 
-Omega_hMesh::Omega_hMesh(Omega_h::Mesh* o_mesh, int generate_edges, int refine,
-                   bool fix_orientation)
+*/
+Omega_hMesh::Omega_hMesh(Omega_h::Mesh* o_mesh, bool fix_orientation)
 {
-   Load(o_mesh, generate_edges, refine, fix_orientation);
+  // where is this function returning a mesh?
+  printf ("coming in o mesh constructor\n");
+   //Load(o_mesh, fix_orientation);
 }
 
 
 
+/*
 void Omega_hMesh::CountBoundaryEntity(apf::Mesh2* o_mesh, const int BcDim,
                                    int &NumBc)
 {
@@ -94,14 +99,14 @@ void Omega_hMesh::Load(Omega_h::Mesh* o_mesh, int generate_edges, int refine,
    // Add a check on o_mesh just in case
    Clear();
 
-  /*
+  //
    // First number vertices
    apf::Field* apf_field_crd = o_mesh->getCoordinateField();
    apf::FieldShape* crd_shape = apf::getShape(apf_field_crd);
    apf::Numbering* v_num_loc = apf::createNumbering(o_mesh, "VertexNumbering",
                                                 crd_shape, 1);
-  */
-    v_num_loc = Write<LO>(mesh.nverts(), 0, 1);
+  //
+   // v_num_loc = Write<LO>(mesh.nverts(), 0, 1);
    auto crd = o_mesh.coords();
    // Check if it is a curved mesh
    //will not be for now
@@ -159,12 +164,12 @@ void Omega_hMesh::Load(Omega_h::Mesh* o_mesh, int generate_edges, int refine,
 
 void OmegaMesh::ReadOmegaMesh(Omega_h::Mesh* o_mesh, LOs v_num_loc,
                               const int curved)
-//***Question: the mfem mesh contents are getting allocated and set on host,
+//Question: the mfem mesh contents are getting allocated and set on host,
 //will it be feasible to set this in device memory//
 {
    // Here fill the element table from SCOREC MESH
    // The vector of element pointers is generated with attr and connectivity
-/*
+//
    apf::MeshIterator* itr = o_mesh->begin(0);
    apf::MeshEntity* ent;
    NumOfVertices = 0;
@@ -175,7 +180,7 @@ void OmegaMesh::ReadOmegaMesh(Omega_h::Mesh* o_mesh, LOs v_num_loc,
       NumOfVertices++;
    }
    o_mesh->end(itr);
-*/
+//
    NumOfVertices = o_mesh->nverts();
   
    Dim = o_mesh->dim();
@@ -183,7 +188,7 @@ void OmegaMesh::ReadOmegaMesh(Omega_h::Mesh* o_mesh, LOs v_num_loc,
    elements.SetSize(NumOfElements);
 
    // Read elements from SCOREC Mesh
-/*
+//
    itr = o_mesh->begin(Dim);
    unsigned int j=0;
    while ((ent = o_mesh->iterate(itr)))
@@ -203,7 +208,7 @@ elem's vertex and
    }
    // End iterator
    o_mesh->end(itr);
-*/
+//
    verts = ask_down(dim(), 0);
 
    // Read Boundaries from SCOREC Mesh
@@ -1261,6 +1266,7 @@ void ParOmega_hMesh::FieldPUMItoMFEM(apf::Mesh2* o_mesh,
    }
    o_mesh->end(it);
 }
+*/
 
 }
 
